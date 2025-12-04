@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  latex-backend:
+    build: ./backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Host Docker access
+      - ./backend/temp:/app/temp  # Persistent temp directory
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
