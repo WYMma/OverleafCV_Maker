@@ -22,7 +22,8 @@ export default function EditorPage() {
   }, [data]);
 
   useEffect(() => {
-    if (!import.meta.env.VITE_GEMINI_API_KEY) {
+    // Check if backend URL is configured instead of Gemini API key
+    if (!import.meta.env.VITE_BACKEND_URL) {
       setApiKeyMissing(true);
     } else {
       setApiKeyMissing(false);
@@ -154,7 +155,7 @@ export default function EditorPage() {
 
       {apiKeyMissing && (
         <div className="bg-yellow-50 text-yellow-800 px-6 py-2 text-xs text-center border-b border-yellow-100">
-          Note: API_KEY is missing. AI features (Auto-Fill & Polish) will not function.
+          Note: Backend URL is missing. AI features (Auto-Fill & Polish) will not function.
         </div>
       )}
 
