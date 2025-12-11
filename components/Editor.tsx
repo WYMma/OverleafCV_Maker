@@ -3,7 +3,6 @@ import { CVData, Experience, Education, Certification, Project, ExtracurricularA
 import { Plus, Trash2, Wand2, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
 import { improveText } from '../services/geminiService';
 import { DatePicker } from './DatePicker';
-import { CountryCodeSelect } from './CountryCodeSelect';
 
 interface EditorProps {
   data: CVData;
@@ -509,7 +508,7 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="relative">
                   <label className="block text-xs font-medium text-slate-500 mb-1">Description</label>
                   <textarea 
                     placeholder="• Organized a university-wide hackathon with 200+ participants..." 
@@ -517,6 +516,20 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
                     value={activity.description}
                     onChange={e => updateExtracurricularActivity(activity.id, 'description', e.target.value)}
                   />
+                  <button 
+                    onClick={async () => {
+                       if (!ensureCoreInfoOrWarn()) return;
+                       setLoadingAI(`activity-${activity.id}`);
+                       const improved = await improveText(activity.description, `Extracurricular activity description for ${activity.organization}`);
+                       updateExtracurricularActivity(activity.id, 'description', improved);
+                       setLoadingAI(null);
+                    }}
+                    disabled={loadingAI === `activity-${activity.id}`}
+                    className="absolute bottom-2 right-2 flex items-center text-xs text-overleaf-600 bg-white px-2 py-1 rounded shadow-sm border border-slate-200 hover:bg-slate-50"
+                  >
+                    <Wand2 size={12} className="mr-1" />
+                    {loadingAI === `activity-${activity.id}` ? '...' : 'AI'}
+                  </button>
                 </div>
               </div>
             ))}
@@ -739,7 +752,7 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="relative">
                   <label className="block text-xs font-medium text-slate-500 mb-1">Description</label>
                   <textarea
                     placeholder="e.g. A personal portfolio website to showcase my projects and skills..."
@@ -747,6 +760,20 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
                     value={proj.description}
                     onChange={e => updateProject(proj.id, 'description', e.target.value)}
                   />
+                  <button 
+                    onClick={async () => {
+                       if (!ensureCoreInfoOrWarn()) return;
+                       setLoadingAI(`proj-${proj.id}`);
+                       const improved = await improveText(proj.description, `Project description for ${proj.name}`);
+                       updateProject(proj.id, 'description', improved);
+                       setLoadingAI(null);
+                    }}
+                    disabled={loadingAI === `proj-${proj.id}`}
+                    className="absolute bottom-2 right-2 flex items-center text-xs text-overleaf-600 bg-white px-2 py-1 rounded shadow-sm border border-slate-200 hover:bg-slate-50"
+                  >
+                    <Wand2 size={12} className="mr-1" />
+                    {loadingAI === `proj-${proj.id}` ? '...' : 'AI'}
+                  </button>
                 </div>
               </div>
             ))}

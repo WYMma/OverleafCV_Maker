@@ -62,7 +62,6 @@ export interface CVData {
   title: string;
   email: string;
   phone: string;
-  phoneCountryCode?: string; // New field for country code
   website: string;
   linkedin: string;
   github: string;
@@ -81,7 +80,6 @@ export const INITIAL_CV_DATA: CVData = {
   title: "",
   email: "",
   phone: "",
-  phoneCountryCode: "+1", // Default to US/Canada code
   website: "",
   linkedin: "",
   github: "",

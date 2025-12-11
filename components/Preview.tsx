@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, ExternalLink, Download, Eye, Loader2, FileText, AlertCircle } from 'lucide-react';
-import { compileLatexToPDF, downloadAsPDF, checkBackendHealth } from '../services/latexService';
+import { Copy, Check, Eye, Loader2, FileText, AlertCircle } from 'lucide-react';
+import { compileLatexToPDF, checkBackendHealth } from '../services/latexService';
 
 interface PreviewProps {
   latexCode: string;
@@ -14,6 +14,21 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [backendAvailable, setBackendAvailable] = useState<boolean | null>(null);
+  
+  // Cache for generated PDFs
+  const [pdfCache, setPdfCache] = useState<Map<string, {url: string, filename: string}>>(new Map());
+  const [lastLatexCode, setLastLatexCode] = useState<string>('');
+  const [currentFilename, setCurrentFilename] = useState<string>('cv.pdf');
+
+  // Extract full name from LaTeX code
+  const extractFullName = (latex: string): string => {
+    const nameMatch = latex.match(/\\name\{([^}]+)\}\{([^}]+)\}/);
+    if (nameMatch) {
+      const [_, firstName, lastName] = nameMatch;
+      return `${firstName.trim()} ${lastName.trim()}`;
+    }
+    return 'CV';
+  };
 
   // Check backend health on component mount
   useEffect(() => {
@@ -33,6 +48,27 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
     checkBackend();
   }, []);
 
+  // Clear cache when LaTeX code changes
+  useEffect(() => {
+    if (latexCode !== lastLatexCode) {
+      // Clear current PDF if code changed
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+        setPdfUrl(null);
+      }
+      setPreviewMode('code');
+      setLastLatexCode(latexCode);
+    }
+  }, [latexCode, lastLatexCode, pdfUrl]);
+
+  // Cleanup cached URLs when component unmounts
+  useEffect(() => {
+    return () => {
+      // Revoke all cached PDF URLs to prevent memory leaks
+      pdfCache.forEach(item => URL.revokeObjectURL(item.url));
+    };
+  }, [pdfCache]);
+
   const handleCopy = () => {
     if (!coreInfoFilled) {
       alert('Please fill in Full Name, Job Title, and Email before exporting your LaTeX.');
@@ -43,51 +79,6 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleDownloadPDF = async () => {
-    if (!coreInfoFilled) {
-      alert('Please fill in Full Name, Job Title, and Email before generating PDF.');
-      return;
-    }
-
-    if (backendAvailable === false) {
-      // Fallback to manual method if backend is not available
-      downloadAsPDF(latexCode);
-      return;
-    }
-
-    setIsGeneratingPDF(true);
-    setError(null);
-    
-    try {
-      const pdfBlob = await compileLatexToPDF(latexCode);
-      const url = URL.createObjectURL(pdfBlob);
-      setPdfUrl(url);
-      
-      // Trigger download
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'cv.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (err) {
-      console.error('PDF generation failed:', err);
-      
-      // Check if it's a Docker-related error
-      if (err.message && err.message.includes('Docker')) {
-        setError('Docker is not running. Please start Docker Desktop to enable PDF compilation. Using manual method.');
-      } else if (err.message && err.message.includes('pdflatex not found')) {
-        setError('LaTeX is not installed on the backend. Please install MiKTeX, TeX Live, or MacTeX. Using manual method.');
-      } else {
-        setError('Backend compilation failed. Using manual method.');
-      }
-      
-      // Fallback to manual method
-      downloadAsPDF(latexCode);
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
 
   const handlePreviewPDF = async () => {
     if (!coreInfoFilled) {
@@ -102,7 +93,16 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
     }
 
     if (backendAvailable === false) {
-      setError('Backend service not available. Please use Download PDF instead.');
+      setError('Backend service not available. Please try again later.');
+      return;
+    }
+
+    // Check if PDF is already cached for this LaTeX code
+    const cachedPdf = pdfCache.get(latexCode);
+    if (cachedPdf) {
+      setPdfUrl(cachedPdf.url);
+      setCurrentFilename(cachedPdf.filename);
+      setPreviewMode('preview');
       return;
     }
 
@@ -110,20 +110,25 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
     setError(null);
     
     try {
-      const pdfBlob = await compileLatexToPDF(latexCode);
-      const url = URL.createObjectURL(pdfBlob);
+      const fullName = extractFullName(latexCode);
+      const { blob, filename } = await compileLatexToPDF(latexCode, fullName);
+      const url = URL.createObjectURL(blob);
+      
+      // Cache the PDF URL and filename for this LaTeX code
+      setPdfCache(prev => new Map(prev).set(latexCode, { url, filename }));
       setPdfUrl(url);
+      setCurrentFilename(filename);
       setPreviewMode('preview');
     } catch (err) {
       console.error('PDF preview failed:', err);
       
       // Check if it's a Docker-related error
       if (err.message && err.message.includes('Docker')) {
-        setError('Docker is not running. Please start Docker Desktop to enable PDF preview. Using manual method.');
+        setError('LaTeX compilation service is not available. Please try again later.');
       } else if (err.message && err.message.includes('pdflatex not found')) {
-        setError('LaTeX is not installed on the backend. Please install MiKTeX, TeX Live, or MacTeX. Using manual method.');
+        setError('LaTeX is not installed on the backend. Please contact administrator.');
       } else {
-        setError('Preview failed. Please try download instead.');
+        setError('Preview failed. Please try again.');
       }
     } finally {
       setIsGeneratingPDF(false);
@@ -135,7 +140,7 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
       <div className="flex items-center justify-between p-4 border-b border-slate-700 bg-slate-800">
         <div className="flex items-center space-x-2">
             <span className="font-mono text-sm font-semibold text-slate-300">
-              {previewMode === 'preview' ? 'cv.pdf' : 'main.tex'}
+              {previewMode === 'preview' ? currentFilename : 'main.tex'}
             </span>
             {backendAvailable === null ? (
               <Loader2 size={12} className="animate-spin text-slate-400" />
@@ -160,27 +165,6 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
                 )}
                 {isGeneratingPDF && previewMode === 'code' ? 'Generating...' : previewMode === 'preview' ? 'View Code' : 'Preview PDF'}
               </button>
-              <button 
-                onClick={handleDownloadPDF}
-                disabled={isGeneratingPDF || !coreInfoFilled}
-                className="flex items-center px-3 py-1.5 rounded text-xs font-medium transition-all bg-green-600 hover:bg-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isGeneratingPDF && previewMode === 'preview' ? (
-                  <Loader2 size={14} className="mr-1.5 animate-spin" />
-                ) : (
-                  <Download size={14} className="mr-1.5" />
-                )}
-                {isGeneratingPDF && previewMode === 'preview' ? 'Generating...' : backendAvailable === false ? 'Manual Download' : 'Download PDF'}
-              </button>
-             <a 
-                href="https://www.overleaf.com/docs" 
-                target="_blank" 
-                rel="noreferrer"
-                className="flex items-center text-xs text-slate-400 hover:text-white transition-colors"
-             >
-                <ExternalLink size={14} className="mr-1" />
-                Overleaf
-             </a>
             <button 
                 onClick={handleCopy}
                 className={`flex items-center px-3 py-1.5 rounded text-xs font-medium transition-all ${copied ? 'bg-green-600 text-white' : 'bg-overleaf-600 hover:bg-overleaf-500 text-white'}`}
@@ -219,7 +203,7 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled }) =
         {previewMode === 'preview' ? (
           <span>PDF Preview - Generated from LaTeX code</span>
         ) : (
-          <span>Create a new project on Overleaf and paste this code into <strong>main.tex</strong></span>
+          <span>Copy the code and use it with your preferred LaTeX compiler</span>
         )}
       </div>
     </div>

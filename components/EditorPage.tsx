@@ -50,21 +50,28 @@ export default function EditorPage() {
           id: Date.now().toString() + i + 100,
           isCurrent: e.isCurrent || false,
           startDate: e.startDate || '',
-          endDate: e.endDate || ''
+          endDate: e.endDate || '',
+          speciality: e.speciality || '',
+          details: e.details || ''
         })) || [],
         certifications: sampleData.certifications?.map((c: any, i: number) => ({
           ...c, 
-          id: Date.now().toString() + i + 200
+          id: Date.now().toString() + i + 200,
+          date: c.date || '',
+          details: c.details || ''
         })) || [],
         projects: sampleData.projects?.map((p: any, i: number) => ({
           ...p, 
           id: Date.now().toString() + i + 300,
-          technologies: p.technologies || ''
+          technologies: p.technologies || '',
+          link: p.link || ''
         })) || [],
         extracurricularActivities: sampleData.extracurricularActivities?.map((a: any, i: number) => ({
           ...a, 
           id: Date.now().toString() + i + 400,
-          isCurrent: a.isCurrent || false
+          isCurrent: a.isCurrent || false,
+          startDate: a.startDate || '',
+          endDate: a.endDate || ''
         })) || [],
         languages: sampleData.languages?.map((l: any, i: number) => ({
           ...l, 

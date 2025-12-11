@@ -6,6 +6,7 @@ export const generateLatex = (data: CVData): string => {
   const sanitize = (str: string) => {
     if (!str) return "";
     return str
+      .replace(/\\/g, "\\textbackslash{}")
       .replace(/&/g, "\\&")
       .replace(/%/g, "\\%")
       .replace(/\$/g, "\\$")
@@ -15,9 +16,11 @@ export const generateLatex = (data: CVData): string => {
       .replace(/\}/g, "\\}")
       .replace(/~/g, "\\textasciitilde{}")
       .replace(/\^/g, "\\textasciicircum{}")
-      .replace(/\\/g, "\\textbackslash{}")
-      .replace(/</g, "\\textless{})")
-      .replace(/>/g, "\\textgreater{})");
+      .replace(/</g, "\\textless{}")
+      .replace(/>/g, "\\textgreater{}")
+      .replace(/\r?\n/g, " ") // Replace newlines with spaces in cvitem content
+      .replace(/\s+/g, " ") // Multiple spaces to single space
+      .trim();
   };
 
   // Split name for moderncv \name command
@@ -76,19 +79,38 @@ ${bullets}
 \\cventry{${sanitize(cert.date)}}{${sanitize(cert.name)}}{${sanitize(cert.provider)}}{}{ }{${sanitize(cert.details)}}
 `).join('\n') || '';
 
-  const skillsSection = data.skills.trim()
-    ? `\\cvitem{}{${sanitize(data.skills)}}`
+  const skillsSection = data.skills && data.skills.trim()
+    ? (() => {
+        const sanitizedSkills = sanitize(data.skills);
+        return sanitizedSkills ? `\\cvitem{}{${sanitizedSkills}}` : '';
+      })()
     : '';
 
   const projectSection = data.projects.map(proj => {
-    const description = sanitize(proj.description);
-    const link = proj.link ? `\\href{${proj.link.replace(/[\\&%$#_{}~^]/g, '\\\\$&')}}{[Link]}` : '';
-    return `\\cvitem{${sanitize(proj.name)}}{${description} ${link}}`;
-  }).join('\n');
+    const description = proj.description
+      .split('\n')
+      .map(line => line.trim())
+      .filter(l => l)
+      .map(line => sanitize(line.replace(/^[•-]\s*/, '')))
+      .join(' ');
+    const link = proj.link ? `\\href{${proj.link.replace(/[\\&%$#_{}~^]/g, '\\$&')}}{[Link]}` : '';
+    const projectName = sanitize(proj.name);
+    const content = `${description} ${link}`.trim();
+    
+    // Only generate cvitem if we have valid content
+    if (!projectName || !content) return '';
+    return `\\cvitem{${projectName}}{${content}}`;
+  }).filter(item => item.trim()).join('\n');
 
   const languagesSection = data.languages && data.languages.length > 0
     ? data.languages
-        .map(lang => `\\cvitem{${sanitize(lang.name)}}{${sanitize(lang.proficiency)}}`)
+        .map(lang => {
+          const langName = sanitize(lang.name);
+          const langProf = sanitize(lang.proficiency);
+          if (!langName || !langProf) return '';
+          return `\\cvitem{${langName}}{${langProf}}`;
+        })
+        .filter(item => item.trim())
         .join('\n')
     : '\\cvitem{}{No languages specified}';
 

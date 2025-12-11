@@ -1,5 +1,5 @@
 // LaTeX compilation service using backend server
-export const compileLatexToPDF = async (latexCode: string): Promise<Blob> => {
+export const compileLatexToPDF = async (latexCode: string, fullName?: string): Promise<{blob: Blob, filename: string}> => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/compile`, {
       method: 'POST',
@@ -7,7 +7,8 @@ export const compileLatexToPDF = async (latexCode: string): Promise<Blob> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        latexCode: latexCode
+        latexCode: latexCode,
+        fullName: fullName
       })
     });
 
@@ -29,7 +30,10 @@ export const compileLatexToPDF = async (latexCode: string): Promise<Blob> => {
       pdfArray[i] = pdfBytes.charCodeAt(i);
     }
 
-    return new Blob([pdfArray], { type: 'application/pdf' });
+    const blob = new Blob([pdfArray], { type: 'application/pdf' });
+    const filename = result.filename || 'cv.pdf';
+    
+    return { blob, filename };
   } catch (error) {
     console.error('Backend compilation failed:', error);
     throw error;
