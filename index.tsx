@@ -4,7 +4,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ClerkProvider } from '@clerk/clerk-react';
 import HomePage from './components/HomePage';
 import EditorPage from './components/EditorPage';
+import SelectionPage from './components/SelectionPage';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
+import { Layout } from './components/Layout';
+import { EditorProvider } from './context/EditorContext';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!PUBLISHABLE_KEY) {
@@ -20,25 +23,42 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-      <Router>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route 
-            path="/editor" 
-            element={
-              <>
-                <SignedIn>
-                  <EditorPage />
-                </SignedIn>
-                <SignedOut>
-                  <Navigate to="/" replace />
-                </SignedOut>
-              </>
-            } 
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+      <EditorProvider>
+        <Router>
+          <Routes>
+            <Route element={<Layout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route
+                path="/create"
+                element={
+                  <>
+                    <SignedIn>
+                      <SelectionPage />
+                    </SignedIn>
+                    <SignedOut>
+                      <Navigate to="/" replace />
+                    </SignedOut>
+                  </>
+                }
+              />
+              <Route
+                path="/editor"
+                element={
+                  <>
+                    <SignedIn>
+                      <EditorPage />
+                    </SignedIn>
+                    <SignedOut>
+                      <Navigate to="/" replace />
+                    </SignedOut>
+                  </>
+                }
+              />
+            </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </EditorProvider>
     </ClerkProvider>
   </React.StrictMode>
 );

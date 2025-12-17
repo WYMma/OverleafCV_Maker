@@ -12,43 +12,7 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-overleaf-50">
-      {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="bg-overleaf-600 p-1.5 rounded text-white">
-              <FileText size={20} />
-            </div>
-            <h1 className="text-xl font-bold text-slate-800 tracking-tight">
-              Overleaf<span className="text-overleaf-600">CV</span>
-            </h1>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="bg-overleaf-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-overleaf-700 transition-colors">
-                  Sign In
-                </button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <button className="border border-overleaf-600 text-overleaf-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-overleaf-50 transition-colors">
-                  Sign Up
-                </button>
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <button 
-                onClick={() => navigate('/editor')}
-                className="bg-overleaf-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-overleaf-700 transition-colors"
-              >
-                Go to Editor
-              </button>
-            </SignedIn>
-          </div>
-        </div>
-      </header>
+    <div className="h-full overflow-y-auto bg-gradient-to-br from-slate-50 to-overleaf-50 flex flex-col">
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-6 py-16">
@@ -58,10 +22,10 @@ export default function HomePage() {
             <span className="text-overleaf-600"> AI-Powered</span> Tools
           </h2>
           <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
-            Build stunning, professional CVs in minutes with our intelligent editor. 
+            Build stunning, professional CVs in minutes with our intelligent editor.
             Powered by AI to help you craft the perfect resume for your dream job.
           </p>
-          
+
           <SignedOut>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <SignUpButton mode="modal">
@@ -76,13 +40,13 @@ export default function HomePage() {
               </SignInButton>
             </div>
           </SignedOut>
-          
+
           <SignedIn>
-            <button 
-              onClick={() => navigate('/editor')}
+            <button
+              onClick={() => navigate('/create')}
               className="bg-overleaf-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-overleaf-700 transition-colors text-lg"
             >
-              Create Your CV
+              Start Creating
             </button>
           </SignedIn>
         </div>
@@ -98,7 +62,7 @@ export default function HomePage() {
               Let AI help you generate professional content tailored to your industry and experience level.
             </p>
           </div>
-          
+
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <div className="bg-overleaf-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
               <FileText className="text-overleaf-600" size={24} />
@@ -108,7 +72,7 @@ export default function HomePage() {
               Choose from carefully designed templates that follow industry standards and best practices.
             </p>
           </div>
-          
+
           <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
             <div className="bg-overleaf-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
               <Shield className="text-overleaf-600" size={24} />
