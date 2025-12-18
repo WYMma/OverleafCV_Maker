@@ -6,7 +6,7 @@ import {
   SignInButton,
   SignUpButton,
 } from '@clerk/clerk-react';
-import { FileText, Sparkles, Shield, Users } from 'lucide-react';
+import { FileText, Sparkles, Shield, Users, FolderOpen } from 'lucide-react';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -42,12 +42,21 @@ export default function HomePage() {
           </SignedOut>
 
           <SignedIn>
-            <button
-              onClick={() => navigate('/create')}
-              className="bg-overleaf-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-overleaf-700 transition-colors text-lg"
-            >
-              Start Creating
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => navigate('/create')}
+                className="bg-overleaf-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-overleaf-700 transition-colors text-lg"
+              >
+                Start Creating
+              </button>
+              <button
+                onClick={() => navigate('/my-cvs')}
+                className="border border-overleaf-600 text-overleaf-600 px-8 py-3 rounded-lg font-medium hover:bg-overleaf-50 transition-colors text-lg flex items-center justify-center gap-2"
+              >
+                <FolderOpen size={20} />
+                My Saved CVs
+              </button>
+            </div>
           </SignedIn>
         </div>
 

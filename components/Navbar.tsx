@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText } from 'lucide-react';
+import { FileText, FolderOpen } from 'lucide-react';
 import {
     SignedIn,
     SignedOut,
@@ -10,6 +10,7 @@ import {
 } from '@clerk/clerk-react';
 import { useEditorContext } from '../context/EditorContext';
 import { Loader2, Sparkles } from 'lucide-react';
+
 
 export const Navbar = () => {
     const navigate = useNavigate();
@@ -72,6 +73,17 @@ export const Navbar = () => {
                         </SignUpButton>
                     </SignedOut>
                     <SignedIn>
+                        {/* My CVs Button */}
+                        {!isEditor && (
+                            <button
+                                onClick={() => navigate('/my-cvs')}
+                                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium text-sm transition-colors"
+                            >
+                                <FolderOpen size={18} />
+                                <span className="hidden sm:inline">My CVs</span>
+                            </button>
+                        )}
+
                         <UserButton afterSignOutUrl="/" />
                     </SignedIn>
                 </div>

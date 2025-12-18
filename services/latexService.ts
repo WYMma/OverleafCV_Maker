@@ -1,5 +1,5 @@
 // LaTeX compilation service using backend server
-export const compileLatexToPDF = async (latexCode: string, fullName?: string): Promise<{blob: Blob, filename: string}> => {
+export const compileLatexToPDF = async (latexCode: string, fullName?: string): Promise<{ blob: Blob, filename: string }> => {
   try {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/compile`, {
       method: 'POST',
@@ -18,7 +18,7 @@ export const compileLatexToPDF = async (latexCode: string, fullName?: string): P
     }
 
     const result = await response.json();
-    
+
     if (!result.success) {
       throw new Error(result.error || 'Compilation failed');
     }
@@ -32,7 +32,7 @@ export const compileLatexToPDF = async (latexCode: string, fullName?: string): P
 
     const blob = new Blob([pdfArray], { type: 'application/pdf' });
     const filename = result.filename || 'cv.pdf';
-    
+
     return { blob, filename };
   } catch (error) {
     console.error('Backend compilation failed:', error);
@@ -83,14 +83,13 @@ export const downloadAsPDF = (latexCode: string, filename: string = 'cv.pdf') =>
   textarea.value = latexCode;
   document.body.appendChild(textarea);
   textarea.select();
-  
+
   // Copy to clipboard
   document.execCommand('copy');
   document.body.removeChild(textarea);
-  
-  // Show instruction dialog
-  alert(`LaTeX code copied to clipboard!\n\nTo generate PDF:\n1. Go to https://www.overleaf.com\n2. Create a new project\n3. Paste the code into main.tex\n4. Click "Recompile" to generate PDF\n5. Download the PDF`);
-  
+
   // Open Overleaf in new tab
   window.open('https://www.overleaf.com/docs', '_blank');
+
+  return true; // Return success status
 };

@@ -75,6 +75,15 @@ export interface CVData {
   languages: Language[];
 }
 
+export interface SavedCV {
+  id: string;
+  userId: string;
+  name: string;
+  cvData: CVData;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const INITIAL_CV_DATA: CVData = {
   fullName: "",
   title: "",
