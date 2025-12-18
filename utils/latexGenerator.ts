@@ -21,6 +21,18 @@ const sanitize = (str: string) => {
     .trim();
 };
 
+const extractHandle = (url: string) => {
+  if (!url) return "";
+  // Remove trailing slashes and get the last part
+  return url.replace(/\/+$/, "").split("/").pop() || "";
+};
+
+const cleanUrl = (url: string) => {
+  if (!url) return "";
+  // Remove protocol and trailing slashes for display
+  return url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+};
+
 // Helper function to create a section only if it has content
 const createSection = (title: string, content: string, condition: boolean = true) => {
   if (!condition || !content.trim()) return '';
@@ -135,12 +147,11 @@ ${bullets}
 
 % Personal data
 \\name{${sanitize(firstName)}}{${sanitize(lastName)}}
-\\title{${sanitize(data.title)}}
 ${data.phone ? `\\phone[mobile]{${sanitize(data.phone)}}` : ''}
 ${data.email ? `\\email{${sanitize(data.email)}}` : ''}
-${data.linkedin ? `\\social[linkedin]{${data.linkedin.split('/').pop()?.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
-${data.github ? `\\social[github]{${data.github.split('/').pop()?.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
-${data.website ? `\\homepage{${data.website.replace(/^https?:\/\//, '').replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.linkedin ? `\\social[linkedin]{${extractHandle(data.linkedin).replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.github ? `\\social[github]{${extractHandle(data.github).replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.website ? `\\homepage{${cleanUrl(data.website).replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
 
 \\begin{document}
 
@@ -206,9 +217,9 @@ ${data.languages.map(lang => `\\ecvitem{${sanitize(lang.name)}}{${sanitize(lang.
 \\ecvname{${sanitize(data.fullName)}}
 ${data.phone ? `\\ecvmobile{${sanitize(data.phone)}}` : ''}
 ${data.email ? `\\ecvemail{${sanitize(data.email)}}` : ''}
-${data.linkedin ? `\\ecvlinkedin{${data.linkedin.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
-${data.github ? `\\ecvgithub{${data.github.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
-${data.website ? `\\ecvhomepage{${data.website.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.linkedin ? `\\ecvlinkedin{${data.linkedin}}` : ''}
+${data.github ? `\\ecvgithub{${data.github}}` : ''}
+${data.website ? `\\ecvhomepage{${data.website}}` : ''}
 
 \\begin{document}
 \\begin{europasscv}
