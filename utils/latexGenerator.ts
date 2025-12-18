@@ -57,19 +57,21 @@ const generateModernCV = (data: CVData, style: 'classic' | 'banking' = 'classic'
       .map(line => `\\item ${sanitize(line.replace(/^[•-]\s*/, ''))}`)
       .join('\n');
 
-    const technologiesLine = exp.technologies
-      ? `\\\\\\textit{Technologies \\\& Skills:} ${sanitize(exp.technologies)}`
-      : '';
-
     const roleAndType = exp.employmentType
       ? `${sanitize(exp.role)} (${sanitize(exp.employmentType)})`
       : sanitize(exp.role);
 
-    return `\\cventry{${sanitize(exp.startDate)}--${sanitize(exp.endDate)}}{${roleAndType}}{${sanitize(exp.company)}}{${sanitize(exp.location)}}{}{%
-\\begin{itemize}%
-${bullets}
-\\end{itemize}
-${technologiesLine}}`;
+    const descriptionContent = bullets
+      ? `\\begin{itemize}%\n${bullets}\n\\end{itemize}`
+      : '';
+
+    const mainEntry = `\\cventry{${sanitize(exp.startDate)}--${sanitize(exp.endDate)}}{${roleAndType}}{${sanitize(exp.company)}}{${sanitize(exp.location)}}{}{${descriptionContent}}`;
+
+    const techEntry = exp.technologies
+      ? `\\cvitem{}{\\small\\textit{Technologies \\\& Skills:} ${sanitize(exp.technologies)}}`
+      : '';
+
+    return techEntry ? `${mainEntry}\n${techEntry}` : mainEntry;
   }).join('\n');
 
   const educationSection = data.education.map(edu => {
@@ -77,9 +79,7 @@ ${technologiesLine}}`;
       ? `${sanitize(edu.startDate)}--${sanitize(edu.endDate)}`
       : sanitize(edu.year);
 
-    return `
-\\cventry{${period}}{${sanitize(edu.degree)}}{${sanitize(edu.institution)}}{${sanitize(edu.location)}}{${sanitize(edu.speciality)}}{${sanitize(edu.details)}}
-`;
+    return `\\cventry{${period}}{${sanitize(edu.degree)}}{${sanitize(edu.institution)}}{${sanitize(edu.location)}}{${sanitize(edu.speciality)}}{${sanitize(edu.details)}}`;
   }).join('\n');
 
   const extracurricularActivitiesSection = data.extracurricularActivities.map(activity => {
@@ -90,10 +90,11 @@ ${technologiesLine}}`;
       .map(line => `\\item ${sanitize(line.replace(/^[•-]\s*/, ''))}`)
       .join('\n');
 
-    return `\\cventry{${sanitize(activity.startDate)}--${sanitize(activity.endDate)}}{${sanitize(activity.organization)}}{${sanitize(activity.location)}}{}{}{%
-\\begin{itemize}%
-${bullets}
-\\end{itemize}}`;
+    const descriptionContent = bullets
+      ? `\\begin{itemize}%\n${bullets}\n\\end{itemize}`
+      : '';
+
+    return `\\cventry{${sanitize(activity.startDate)}--${sanitize(activity.endDate)}}{${sanitize(activity.organization)}}{${sanitize(activity.location)}}{}{}{${descriptionContent}}`;
   }).join('\n');
 
   const certificationsSection = data.certifications?.map((cert: any) => `
