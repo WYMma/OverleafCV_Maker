@@ -73,18 +73,15 @@ export const Navbar = () => {
                         </SignUpButton>
                     </SignedOut>
                     <SignedIn>
-                        {/* My CVs Button */}
-                        {!isEditor && (
-                            <button
-                                onClick={() => navigate('/my-cvs')}
-                                className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-xl font-semibold text-sm transition-all"
-                            >
-                                <FolderOpen size={18} className="text-primary-600" />
-                                <span className="hidden sm:inline">Collections</span>
-                            </button>
-                        )}
-
-                        <UserButton afterSignOutUrl="/" />
+                        <UserButton afterSignOutUrl="/">
+                            <UserButton.MenuItems>
+                                <UserButton.Action
+                                    label="My CVs"
+                                    labelIcon={<FolderOpen size={16} />}
+                                    onClick={() => navigate('/my-cvs')}
+                                />
+                            </UserButton.MenuItems>
+                        </UserButton>
                     </SignedIn>
                 </div>
             </div>
