@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Eye, Loader2, FileText, AlertCircle, Save, Sparkles } from 'lucide-react';
+import { Copy, Check, Eye, Loader2, FileText, AlertCircle, Save, Sparkles, Download } from 'lucide-react';
 import { compileLatexToPDF, checkBackendHealth } from '../services/latexService';
 import { SignedIn } from '@clerk/clerk-react';
 import { useToast } from '../context/ToastContext';
@@ -141,6 +141,17 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled, onS
     }
   };
 
+  const handleDownloadPDF = () => {
+    if (!pdfUrl) return;
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = currentFilename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('CV downloaded successfully!', 'success');
+  };
+
   return (
     <div className="h-full flex flex-col bg-black/60 backdrop-blur-2xl text-slate-100">
       <div className="flex items-center justify-between p-5 border-b border-white/10 bg-black/20 backdrop-blur-md">
@@ -177,6 +188,16 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled, onS
                 {loadedCVId ? 'Update' : 'Save'}
               </button>
             </SignedIn>
+          )}
+          {previewMode === 'preview' && pdfUrl && (
+            <button
+              onClick={handleDownloadPDF}
+              className="flex items-center px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-700/80 hover:bg-slate-600 text-white border border-white/10 shadow-lg active:scale-95 group"
+              title="Download PDF"
+            >
+              <Download size={16} className="mr-2 text-primary-400 group-hover:translate-y-0.5 transition-transform" />
+              Download
+            </button>
           )}
           <button
             onClick={handlePreviewPDF}
@@ -215,7 +236,7 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled, onS
         {previewMode === 'preview' && pdfUrl ? (
           <div className="h-full w-full bg-slate-900 p-4">
             <iframe
-              src={`${pdfUrl}#toolbar=0&view=FitH`}
+              src={`${pdfUrl}#toolbar=0&view=Fit`}
               className="w-full h-full border-0 bg-transparent rounded-2xl shadow-2xl"
               title="PDF Preview"
             />

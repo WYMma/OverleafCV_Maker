@@ -84,9 +84,7 @@ export const Navbar = () => {
                             </button>
                         )}
 
-                        <div className="bg-white/50 p-1.5 rounded-full border border-white shadow-sm ring-1 ring-slate-200/50">
-                            <UserButton afterSignOutUrl="/" />
-                        </div>
+                        <UserButton afterSignOutUrl="/" />
                     </SignedIn>
                 </div>
             </div>
