@@ -1,8 +1,6 @@
 import { CVData } from "../types";
 
-// Hardcoded for debugging
-const BACKEND_URL = 'http://localhost:3001';
-// const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 export const improveText = async (text: string, context: string): Promise<string> => {
   try {
