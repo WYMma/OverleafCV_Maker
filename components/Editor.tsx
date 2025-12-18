@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CVData, Experience, Education, Certification, Project, ExtracurricularActivity } from '../types';
-import { Plus, Trash2, Wand2, ChevronDown, ChevronUp, AlertCircle, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Wand2, ChevronDown, ChevronUp, AlertCircle, Sparkles, Layout } from 'lucide-react';
 import { improveText } from '../services/geminiService';
 import { DatePicker } from './DatePicker';
 
@@ -22,7 +22,7 @@ const SectionHeader = ({ title, isOpen, toggle }: { title: string, isOpen: boole
 );
 
 export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
-  const [activeSection, setActiveSection] = useState<string | null>('personal');
+  const [activeSection, setActiveSection] = useState<string | null>('design');
   const [loadingAI, setLoadingAI] = useState<string | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [newLanguage, setNewLanguage] = useState({ name: '', proficiency: 'Fluent' as const });
@@ -250,6 +250,43 @@ export const Editor: React.FC<EditorProps> = ({ data, onChange }) => {
           <span className="leading-relaxed font-semibold">{validationError}</span>
         </div>
       )}
+
+
+      {/* Design & Template */}
+      <div className="border-b border-slate-100">
+        <SectionHeader title="Design & Template" isOpen={activeSection === 'design'} toggle={() => toggleSection('design')} />
+        {activeSection === 'design' && (
+          <div className="p-6 bg-white/20 animate-in fade-in slide-in-from-left-4 duration-500">
+            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">Select CV Standard</label>
+            <div className="grid grid-cols-1 gap-3">
+              {[
+                { id: 'moderncv', name: 'ModernCV (Default)', desc: 'Clean, elegant, and professional' },
+                { id: 'europass', name: 'EuroPass', desc: 'Standard European format for job seekers' },
+                { id: 'canadian', name: 'Canadian/banking', desc: 'Clean chronological layout (banking style)' }
+              ].map((template) => (
+                <button
+                  key={template.id}
+                  onClick={() => updateField('template', template.id as any)}
+                  className={`flex flex-col items-start p-4 rounded-2xl border-2 transition-all text-left ${data.template === template.id
+                    ? 'border-primary-500 bg-primary-50/50 ring-4 ring-primary-500/10'
+                    : 'border-slate-100 bg-white hover:border-slate-200 shadow-sm'
+                    }`}
+                >
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className={`text-sm font-bold ${data.template === template.id ? 'text-primary-700' : 'text-slate-700'}`}>
+                      {template.name}
+                    </span>
+                    {data.template === template.id && (
+                      <div className="w-2 h-2 bg-primary-500 rounded-full" />
+                    )}
+                  </div>
+                  <span className="text-xs text-slate-500 leading-tight">{template.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Personal Info */}
       <div className="border-b border-slate-100">

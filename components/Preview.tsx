@@ -182,10 +182,14 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled, onS
             <SignedIn>
               <button
                 onClick={onSaveCV}
-                className="flex items-center px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-500/10 active:scale-95 border border-primary-400/20"
+                className="group relative overflow-hidden flex items-center px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white shadow-lg shadow-primary-500/20 active:scale-95 border border-primary-400/30"
               >
-                <Save size={16} className="mr-2" />
-                {loadedCVId ? 'Update' : 'Save'}
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.2),transparent)] opacity-50" />
+                <Save size={16} className="mr-2 relative z-10 group-hover:scale-110 transition-transform" />
+                <span className="relative z-10">
+                  {loadedCVId ? 'Update CV' : 'Save CV'}
+                </span>
               </button>
             </SignedIn>
           )}

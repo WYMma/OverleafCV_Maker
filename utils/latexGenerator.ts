@@ -1,28 +1,37 @@
-
 import { CVData } from "../types";
 
-export const generateLatex = (data: CVData): string => {
-  // Function to sanitize text for LaTeX output
-  const sanitize = (str: string) => {
-    if (!str) return "";
-    return str
-      .replace(/\\/g, "\\textbackslash{}")
-      .replace(/&/g, "\\&")
-      .replace(/%/g, "\\%")
-      .replace(/\$/g, "\\$")
-      .replace(/#/g, "\\#")
-      .replace(/_/g, "\\_")
-      .replace(/\{/g, "\\{")
-      .replace(/\}/g, "\\}")
-      .replace(/~/g, "\\textasciitilde{}")
-      .replace(/\^/g, "\\textasciicircum{}")
-      .replace(/</g, "\\textless{}")
-      .replace(/>/g, "\\textgreater{}")
-      .replace(/\r?\n/g, " ") // Replace newlines with spaces in cvitem content
-      .replace(/\s+/g, " ") // Multiple spaces to single space
-      .trim();
-  };
+// Function to sanitize text for LaTeX output
+const sanitize = (str: string) => {
+  if (!str) return "";
+  return str
+    .replace(/\\/g, "\\textbackslash{}")
+    .replace(/&/g, "\\&")
+    .replace(/%/g, "\\%")
+    .replace(/\$/g, "\\$")
+    .replace(/#/g, "\\#")
+    .replace(/_/g, "\\_")
+    .replace(/\{/g, "\\{")
+    .replace(/\}/g, "\\}")
+    .replace(/~/g, "\\textasciitilde{}")
+    .replace(/\^/g, "\\textasciicircum{}")
+    .replace(/</g, "\\textless{}")
+    .replace(/>/g, "\\textgreater{}")
+    .replace(/\r?\n/g, " ") // Replace newlines with spaces in cvitem content
+    .replace(/\s+/g, " ") // Multiple spaces to single space
+    .trim();
+};
 
+// Helper function to create a section only if it has content
+const createSection = (title: string, content: string, condition: boolean = true) => {
+  if (!condition || !content.trim()) return '';
+  return `%-----------${title.toUpperCase()}-----------
+\\section{${title}}
+${content}
+
+`;
+};
+
+const generateModernCV = (data: CVData, style: 'classic' | 'banking' = 'classic'): string => {
   // Split name for moderncv \name command
   const nameParts = data.fullName.split(' ');
   const lastName = nameParts.pop() || '';
@@ -37,7 +46,7 @@ export const generateLatex = (data: CVData): string => {
       .join('\n');
 
     const technologiesLine = exp.technologies
-      ? `\\textit{Technologies \\\& Skills:} ${sanitize(exp.technologies)}\[0.5em]`
+      ? `\\\\\\textit{Technologies \\\& Skills:} ${sanitize(exp.technologies)}`
       : '';
 
     const roleAndType = exp.employmentType
@@ -75,15 +84,15 @@ ${bullets}
 \\end{itemize}}`;
   }).join('\n');
 
-  const certificationsSection = (data as any).certifications?.map((cert: any) => `
+  const certificationsSection = data.certifications?.map((cert: any) => `
 \\cventry{${sanitize(cert.date)}}{${sanitize(cert.name)}}{${sanitize(cert.provider)}}{}{ }{${sanitize(cert.details)}}
 `).join('\n') || '';
 
   const skillsSection = data.skills && data.skills.trim()
     ? (() => {
-        const sanitizedSkills = sanitize(data.skills);
-        return sanitizedSkills ? `\\cvitem{}{${sanitizedSkills}}` : '';
-      })()
+      const sanitizedSkills = sanitize(data.skills);
+      return sanitizedSkills ? `\\cvitem{}{${sanitizedSkills}}` : '';
+    })()
     : '';
 
   const projectSection = data.projects.map(proj => {
@@ -96,7 +105,7 @@ ${bullets}
     const link = proj.link ? `\\href{${proj.link.replace(/[\\&%$#_{}~^]/g, '\\$&')}}{[Link]}` : '';
     const projectName = sanitize(proj.name);
     const content = `${description} ${link}`.trim();
-    
+
     // Only generate cvitem if we have valid content
     if (!projectName || !content) return '';
     return `\\cvitem{${projectName}}{${content}}`;
@@ -104,30 +113,20 @@ ${bullets}
 
   const languagesSection = data.languages && data.languages.length > 0
     ? data.languages
-        .map(lang => {
-          const langName = sanitize(lang.name);
-          const langProf = sanitize(lang.proficiency);
-          if (!langName || !langProf) return '';
-          return `\\cvitem{${langName}}{${langProf}}`;
-        })
-        .filter(item => item.trim())
-        .join('\n')
+      .map(lang => {
+        const langName = sanitize(lang.name);
+        const langProf = sanitize(lang.proficiency);
+        if (!langName || !langProf) return '';
+        return `\\cvitem{${langName}}{${langProf}}`;
+      })
+      .filter(item => item.trim())
+      .join('\n')
     : '\\cvitem{}{No languages specified}';
-
-  // Helper function to create a section only if it has content
-  const createSection = (title: string, content: string, condition: boolean = true) => {
-    if (!condition || !content.trim()) return '';
-    return `%-----------${title.toUpperCase()}-----------
-\\section{${title}}
-${content}
-
-`;
-  };
 
   return `\\documentclass[11pt,a4paper,sans]{moderncv}
 
 % ModernCV theme and color
-\\moderncvstyle{classic}
+\\moderncvstyle{${style}}
 \\moderncvcolor{green}
 \\usepackage[utf8]{inputenc}
 \\usepackage[scale=0.8]{geometry}
@@ -139,9 +138,9 @@ ${content}
 \\title{${sanitize(data.title)}}
 ${data.phone ? `\\phone[mobile]{${sanitize(data.phone)}}` : ''}
 ${data.email ? `\\email{${sanitize(data.email)}}` : ''}
-${data.linkedin ? `\\social[linkedin]{${data.linkedin.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
-${data.github ? `\\social[github]{${data.github.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
-${data.website ? `\\homepage{${data.website.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.linkedin ? `\\social[linkedin]{${data.linkedin.split('/').pop()?.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.github ? `\\social[github]{${data.github.split('/').pop()?.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.website ? `\\homepage{${data.website.replace(/^https?:\/\//, '').replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
 
 \\begin{document}
 
@@ -158,4 +157,81 @@ ${createSection('Projects \\& Interests', projectSection, data.projects?.length 
 
 \\end{document}
 `;
+};
+
+const generateEuroPassCV = (data: CVData): string => {
+  const nameParts = data.fullName.split(' ');
+  const lastName = nameParts.pop() || '';
+  const firstName = nameParts.join(' ');
+
+  const experienceSection = data.experience.map(exp => {
+    const bullets = exp.description
+      .split('\n')
+      .map(line => line.trim())
+      .filter(l => l)
+      .map(line => `\\item ${sanitize(line.replace(/^[•-]\s*/, ''))}`)
+      .join('\n');
+
+    return `\\ecvtitle{${sanitize(exp.startDate)}--${sanitize(exp.endDate)}}{${sanitize(exp.role)}}
+\\ecvitem{}{${sanitize(exp.company)}, ${sanitize(exp.location)}}
+\\ecvitem{}{%
+\\begin{itemize}%
+${bullets}
+\\end{itemize}}`;
+  }).join('\n');
+
+  const educationSection = data.education.map(edu => {
+    const period = edu.startDate && edu.endDate
+      ? `${sanitize(edu.startDate)}--${sanitize(edu.endDate)}`
+      : sanitize(edu.year);
+
+    return `\\ecvtitle{${period}}{${sanitize(edu.degree)}}
+\\ecvitem{}{${sanitize(edu.institution)}, ${sanitize(edu.location)}}
+\\ecvitem{}{${sanitize(edu.speciality)} -- ${sanitize(edu.details)}}`;
+  }).join('\n');
+
+  const skillsSection = data.skills && data.skills.trim()
+    ? `\\ecvsection{Digital Skills}
+\\ecvitem{}{${sanitize(data.skills)}}`
+    : '';
+
+  const languagesSection = data.languages && data.languages.length > 0
+    ? `\\ecvsection{Languages}
+${data.languages.map(lang => `\\ecvitem{${sanitize(lang.name)}}{${sanitize(lang.proficiency)}}`).join('\n')}`
+    : '';
+
+  return `\\documentclass[english,a4paper]{europasscv}
+\\usepackage[utf8]{inputenc}
+
+\\ecvname{${sanitize(data.fullName)}}
+${data.phone ? `\\ecvmobile{${sanitize(data.phone)}}` : ''}
+${data.email ? `\\ecvemail{${sanitize(data.email)}}` : ''}
+${data.linkedin ? `\\ecvlinkedin{${data.linkedin.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.github ? `\\ecvgithub{${data.github.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+${data.website ? `\\ecvhomepage{${data.website.replace(/[\\&%$#_{}~^]/g, '\\$&')}}` : ''}
+
+\\begin{document}
+\\begin{europasscv}
+\\ecvpersonalinfo
+
+${createSection('Work Experience', experienceSection, data.experience?.length > 0).replace(/\\section/g, '\\ecvsection')}
+${createSection('Education and training', educationSection, data.education?.length > 0).replace(/\\section/g, '\\ecvsection')}
+${languagesSection}
+${skillsSection}
+
+\\end{europasscv}
+\\end{document}
+`;
+};
+
+export const generateLatex = (data: CVData): string => {
+  switch (data.template) {
+    case 'europass':
+      return generateEuroPassCV(data);
+    case 'canadian':
+      return generateModernCV(data, 'banking');
+    case 'moderncv':
+    default:
+      return generateModernCV(data, 'classic');
+  }
 };

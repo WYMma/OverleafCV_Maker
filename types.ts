@@ -73,6 +73,7 @@ export interface CVData {
   projects: Project[];
   extracurricularActivities: ExtracurricularActivity[];
   languages: Language[];
+  template: 'moderncv' | 'europass' | 'canadian';
 }
 
 export interface SavedCV {
@@ -100,4 +101,5 @@ export const INITIAL_CV_DATA: CVData = {
   projects: [],
   extracurricularActivities: [],
   languages: [],
+  template: 'moderncv',
 };
