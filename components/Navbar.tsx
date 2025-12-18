@@ -26,24 +26,24 @@ export const Navbar = () => {
     };
 
     return (
-        <nav className="h-16 flex-none border-b border-slate-200 bg-white flex items-center justify-between px-6">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/')}>
-                <div className="bg-overleaf-600 p-1.5 rounded text-white hidden sm:block">
+        <nav className="h-16 flex-none glass border-b border-white/20 sticky top-0 z-[50] flex items-center justify-between px-6 shadow-glass">
+            <div className="flex items-center space-x-3 cursor-pointer group" onClick={() => navigate('/')}>
+                <div className="bg-primary-600 p-1.5 rounded-xl text-white hidden sm:flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:scale-110 transition-transform">
                     <FileText size={20} />
                 </div>
-                <h1 className="text-xl font-bold text-slate-800 tracking-tight">
-                    Overleaf<span className="text-overleaf-600">CV</span>
+                <h1 className="text-xl font-display font-bold text-slate-900 tracking-tight">
+                    Hire<span className="text-primary-600">Docs</span>
                 </h1>
             </div>
 
             <div className="flex items-center flex-1 justify-end space-x-4">
                 {/* Editor AI Control */}
                 {isEditor && (
-                    <div className="hidden md:flex items-center space-x-2 bg-slate-50 p-1 rounded-lg border border-slate-200 mr-4">
+                    <div className="hidden md:flex items-center space-x-2 bg-white/50 backdrop-blur-sm p-1 rounded-2xl border border-white/50 mr-4 shadow-sm focus-within:ring-2 focus-within:ring-primary-500/20 transition-all">
                         <input
                             type="text"
                             placeholder="Data Scientist, Nurse..."
-                            className="bg-transparent border-none outline-none text-sm px-3 w-48 text-slate-700 placeholder:text-slate-400"
+                            className="bg-transparent border-none outline-none text-sm px-4 w-56 text-slate-700 placeholder:text-slate-400 font-medium"
                             value={generationJob}
                             onChange={(e) => setGenerationJob(e.target.value)}
                             onKeyDown={handleKeyDown}
@@ -51,23 +51,23 @@ export const Navbar = () => {
                         <button
                             onClick={triggerGenerate}
                             disabled={isGenerating || !generationJob}
-                            className="bg-slate-900 text-white px-3 py-1.5 rounded-md text-xs font-medium flex items-center hover:bg-slate-800 disabled:opacity-50 transition-all"
+                            className="bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center hover:bg-slate-800 disabled:opacity-50 transition-all shadow-lg active:scale-95"
                         >
-                            {isGenerating ? <Loader2 size={14} className="animate-spin mr-2" /> : <Sparkles size={14} className="mr-2 text-yellow-400" />}
+                            {isGenerating ? <Loader2 size={14} className="animate-spin mr-2" /> : <Sparkles size={14} className="mr-2 text-primary-400" />}
                             Auto-Fill
                         </button>
                     </div>
                 )}
 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
                     <SignedOut>
                         <SignInButton mode="modal">
-                            <button className="text-slate-600 hover:text-slate-900 font-medium text-sm transition-colors">
+                            <button className="px-4 py-2 text-slate-600 hover:text-slate-900 font-semibold text-sm transition-colors">
                                 Sign In
                             </button>
                         </SignInButton>
                         <SignUpButton mode="modal">
-                            <button className="bg-overleaf-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-overleaf-700 transition-colors">
+                            <button className="bg-primary-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-primary-500 transition-all shadow-lg shadow-primary-500/20 active:scale-95">
                                 Sign Up
                             </button>
                         </SignUpButton>
@@ -77,14 +77,16 @@ export const Navbar = () => {
                         {!isEditor && (
                             <button
                                 onClick={() => navigate('/my-cvs')}
-                                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-medium text-sm transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-white/50 rounded-xl font-semibold text-sm transition-all"
                             >
-                                <FolderOpen size={18} />
-                                <span className="hidden sm:inline">My CVs</span>
+                                <FolderOpen size={18} className="text-primary-600" />
+                                <span className="hidden sm:inline">Collections</span>
                             </button>
                         )}
 
-                        <UserButton afterSignOutUrl="/" />
+                        <div className="bg-white/50 p-1.5 rounded-full border border-white shadow-sm ring-1 ring-slate-200/50">
+                            <UserButton afterSignOutUrl="/" />
+                        </div>
                     </SignedIn>
                 </div>
             </div>

@@ -49,70 +49,85 @@ export const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, disable
   };
 
   return (
-    <div className="relative" ref={pickerRef}>
-      <input
-        type="text"
-        readOnly
-        className={`w-full p-2 border border-slate-200 rounded text-sm bg-white ${!value ? 'text-slate-400' : 'text-slate-900'} ${disabled ? 'cursor-not-allowed bg-slate-100' : 'cursor-pointer'}`}
-        value={value || 'Select a date'}
-        onClick={() => !disabled && setIsPickerOpen(!isPickerOpen)}
-        placeholder="Select a date"
-      />
-      {isPickerOpen && (
-        <div className="absolute z-10 mt-1 bg-white border border-slate-300 rounded-md shadow-lg">
-          <div className="flex items-center justify-center gap-4 p-4">
-            {/* Month Picker */}
-            <div className="flex flex-col items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleMonthChange(1)}
-                className="p-1 disabled:opacity-50"
-              >
-                <ChevronUp size={18} />
-              </button>
-              <span className="font-semibold text-slate-700 w-24 text-center">
-                {format(currentDate, 'MMMM')}
-              </span>
-              <button
-                type="button"
-                onClick={() => handleMonthChange(-1)}
-                className="p-1 disabled:opacity-50"
-              >
-                <ChevronDown size={18} />
-              </button>
-            </div>
+    <div className="relative w-full" ref={pickerRef}>
+      <div className="relative group">
+        <input
+          type="text"
+          readOnly
+          className={`w-full p-3 pl-4 pr-10 border border-slate-200 rounded-xl text-sm transition-all outline-none
+            ${!value ? 'text-slate-400 bg-slate-50' : 'text-slate-700 bg-white'} 
+            ${disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:border-primary-400/50 hover:bg-white focus:ring-2 focus:ring-primary-500/10 focus:border-primary-500/50'}
+          `}
+          value={value || 'Select a date'}
+          onClick={() => !disabled && setIsPickerOpen(!isPickerOpen)}
+          placeholder="Select a date"
+        />
+        <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-primary-500 transition-colors pointer-events-none">
+          <ChevronDown size={16} className={`transition-transform duration-300 ${isPickerOpen ? 'rotate-180' : ''}`} />
+        </div>
+      </div>
 
-            {/* Year Picker */}
-            <div className="flex flex-col items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleYearChange(1)}
-                disabled={currentDate.getFullYear() >= toYear}
-                className="p-1 disabled:opacity-50"
-              >
-                <ChevronUp size={18} />
-              </button>
-              <span className="font-semibold text-slate-700 w-16 text-center">
-                {format(currentDate, 'yyyy')}
-              </span>
-              <button
-                type="button"
-                onClick={() => handleYearChange(-1)}
-                disabled={currentDate.getFullYear() <= fromYear}
-                className="p-1 disabled:opacity-50"
-              >
-                <ChevronDown size={18} />
-              </button>
+      {isPickerOpen && (
+        <div className="absolute z-[50] mt-2 w-64 glass backdrop-blur-2xl rounded-2xl border border-white/40 shadow-premium overflow-hidden animate-in fade-in zoom-in-95 duration-200 origin-top-left">
+          <div className="p-4 bg-white/40">
+            <div className="flex items-center justify-between gap-4">
+              {/* Month Picker */}
+              <div className="flex-1 flex flex-col items-center gap-1 p-2 bg-white/50 rounded-xl border border-white/20 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => handleMonthChange(1)}
+                  className="p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
+                >
+                  <ChevronUp size={16} />
+                </button>
+                <span className="font-display font-bold text-slate-700 text-xs uppercase tracking-wider h-6 flex items-center justify-center">
+                  {format(currentDate, 'MMM')}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleMonthChange(-1)}
+                  className="p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
+                >
+                  <ChevronDown size={16} />
+                </button>
+              </div>
+
+              {/* Year Picker */}
+              <div className="flex-1 flex flex-col items-center gap-1 p-2 bg-white/50 rounded-xl border border-white/20 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => handleYearChange(1)}
+                  disabled={currentDate.getFullYear() >= toYear}
+                  className="p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <ChevronUp size={16} />
+                </button>
+                <span className="font-display font-bold text-slate-700 text-xs tracking-widest h-6 flex items-center justify-center">
+                  {format(currentDate, 'yyyy')}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleYearChange(-1)}
+                  disabled={currentDate.getFullYear() <= fromYear}
+                  className="p-1 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent"
+                >
+                  <ChevronDown size={16} />
+                </button>
+              </div>
             </div>
           </div>
-          <button
-            onClick={handleApply}
-            className="w-full p-1.5 bg-slate-800 text-white rounded-b text-xs hover:bg-slate-700"
-          >
-            Select
-          </button>
+
+          <div className="p-2 border-t border-white/20 bg-white/20">
+            <button
+              onClick={handleApply}
+              className="w-full py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-primary-600 transition-all active:scale-[0.98] shadow-lg shadow-black/5"
+            >
+              Apply Selected Date
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 };
+

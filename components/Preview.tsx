@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Eye, Loader2, FileText, AlertCircle, Save } from 'lucide-react';
+import { Copy, Check, Eye, Loader2, FileText, AlertCircle, Save, Sparkles } from 'lucide-react';
 import { compileLatexToPDF, checkBackendHealth } from '../services/latexService';
 import { SignedIn } from '@clerk/clerk-react';
 import { useToast } from '../context/ToastContext';
@@ -142,86 +142,106 @@ export const Preview: React.FC<PreviewProps> = ({ latexCode, coreInfoFilled, onS
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-900 text-slate-100">
-      <div className="flex items-center justify-between p-4 border-b border-slate-700 bg-slate-800">
-        <div className="flex items-center space-x-2">
-          <span className="font-mono text-sm font-semibold text-slate-300">
-            {previewMode === 'preview' ? currentFilename : 'main.tex'}
-          </span>
-          {backendAvailable === null ? (
-            <Loader2 size={12} className="animate-spin text-slate-400" />
-          ) : backendAvailable ? (
-            <div className="w-2 h-2 bg-green-500 rounded-full" title="Backend service available" />
-          ) : (
-            <div className="w-2 h-2 bg-red-500 rounded-full" title="Backend service unavailable" />
-          )}
+    <div className="h-full flex flex-col bg-black/60 backdrop-blur-2xl text-slate-100">
+      <div className="flex items-center justify-between p-5 border-b border-white/10 bg-black/20 backdrop-blur-md">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-slate-700/50 rounded-xl shadow-inner shadow-black/20">
+            <FileText size={18} className="text-primary-400" />
+          </div>
+          <div className="flex flex-col">
+            <span className="font-mono text-xs font-bold text-slate-200 tracking-tight">
+              {previewMode === 'preview' ? currentFilename : 'source.tex'}
+            </span>
+            <div className="flex items-center space-x-1.5 mt-0.5">
+              {backendAvailable === null ? (
+                <Loader2 size={10} className="animate-spin text-slate-500" />
+              ) : backendAvailable ? (
+                <div className="w-1.5 h-1.5 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              ) : (
+                <div className="w-1.5 h-1.5 bg-red-500 rounded-full" />
+              )}
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">
+                {backendAvailable ? 'Service Active' : 'Offline'}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           {onSaveCV && (
             <SignedIn>
               <button
                 onClick={onSaveCV}
-                className="flex items-center px-3 py-1.5 rounded text-xs font-medium transition-all bg-green-600 hover:bg-green-500 text-white"
+                className="flex items-center px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-primary-600 hover:bg-primary-500 text-white shadow-lg shadow-primary-500/10 active:scale-95 border border-primary-400/20"
               >
-                <Save size={14} className="mr-1.5" />
-                {loadedCVId ? 'Update CV' : 'Save CV'}
+                <Save size={16} className="mr-2" />
+                {loadedCVId ? 'Update' : 'Save'}
               </button>
             </SignedIn>
           )}
           <button
             onClick={handlePreviewPDF}
             disabled={isGeneratingPDF || !coreInfoFilled || backendAvailable === false}
-            className="flex items-center px-3 py-1.5 rounded text-xs font-medium transition-all bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-white/10 hover:bg-white/20 text-white border border-white/10 shadow-lg active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed group"
           >
             {isGeneratingPDF && previewMode === 'code' ? (
-              <Loader2 size={14} className="mr-1.5 animate-spin" />
+              <Loader2 size={16} className="mr-2 animate-spin" />
             ) : previewMode === 'preview' ? (
-              <FileText size={14} className="mr-1.5" />
+              <Eye size={16} className="mr-2 text-primary-400" />
             ) : (
-              <Eye size={14} className="mr-1.5" />
+              <Sparkles size={16} className="mr-2 text-primary-400 group-hover:scale-110 transition-transform" />
             )}
-            {isGeneratingPDF && previewMode === 'code' ? 'Generating...' : previewMode === 'preview' ? 'View Code' : 'Preview PDF'}
+            {isGeneratingPDF && previewMode === 'code' ? 'Building...' : previewMode === 'preview' ? 'Edit Source' : 'Generate PDF'}
           </button>
           <button
             onClick={handleCopy}
-            className={`flex items-center px-3 py-1.5 rounded text-xs font-medium transition-all ${copied ? 'bg-green-600 text-white' : 'bg-overleaf-600 hover:bg-overleaf-500 text-white'}`}
+            className={`p-2.5 rounded-xl transition-all shadow-lg active:scale-95 border ${copied ? 'bg-primary-600 border-primary-500' : 'bg-slate-700/50 hover:bg-slate-600/50 border-white/5'}`}
+            title="Copy LaTeX"
           >
-            {copied ? <Check size={14} className="mr-1.5" /> : <Copy size={14} className="mr-1.5" />}
-            {copied ? 'Copied!' : 'Copy Code'}
+            {copied ? <Check size={18} className="text-white" /> : <Copy size={18} className="text-slate-300" />}
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="mx-4 mt-3 mb-1 flex items-start rounded border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-          <span>{error}</span>
+        <div className="mx-6 mt-4 flex items-start rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-200 shadow-xl animate-in fade-in slide-in-from-top-4">
+          <AlertCircle size={16} className="mr-3 mt-0.5 text-amber-400" />
+          <span className="leading-relaxed font-semibold">{error}</span>
         </div>
       )}
 
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-hidden relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.05),transparent)] pointer-events-none" />
+
         {previewMode === 'preview' && pdfUrl ? (
-          <iframe
-            src={pdfUrl}
-            className="w-full h-full border-0 bg-white"
-            title="PDF Preview"
-          />
+          <div className="h-full w-full bg-slate-900 p-4">
+            <iframe
+              src={`${pdfUrl}#toolbar=0&view=FitH`}
+              className="w-full h-full border-0 bg-transparent rounded-2xl shadow-2xl"
+              title="PDF Preview"
+            />
+          </div>
         ) : (
-          <div className="p-4 font-mono text-xs leading-relaxed custom-scrollbar">
+          <div className="h-full overflow-auto p-6 font-mono text-[12.5px] leading-tight selection:bg-primary-500/40 bg-black/40">
             <pre className="whitespace-pre-wrap break-all">
               <code className="language-tex">
-                {latexCode}
+                {latexCode.split('\n').map((line, i) => (
+                  <div key={i} className="group flex py-0.5">
+                    <span className="w-10 inline-block text-slate-600 text-right pr-6 select-none group-hover:text-slate-400 transition-colors border-r border-white/5 mr-4">{(i + 1).toString().padStart(2, ' ')}</span>
+                    <span className={`${line.trim().startsWith('%') ? 'text-slate-500 italic font-light' : line.trim().startsWith('\\') ? 'text-primary-300 font-semibold' : 'text-slate-100'}`}>{line}</span>
+                  </div>
+                ))}
               </code>
             </pre>
           </div>
         )}
       </div>
 
-      <div className="p-3 bg-slate-800 border-t border-slate-700 text-xs text-slate-400 text-center">
-        {previewMode === 'preview' ? (
-          <span>PDF Preview - Generated from LaTeX code</span>
-        ) : (
-          <span>Copy the code and use it with your preferred LaTeX compiler</span>
-        )}
+      <div className="px-6 py-3 bg-slate-900/60 backdrop-blur-md border-t border-white/5 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] flex justify-between items-center">
+        <span>Ready to Export</span>
+        <div className="flex items-center space-x-4">
+          <span className="hover:text-primary-400 transition-colors cursor-help">LaTeX 2e</span>
+          <span className="hover:text-primary-400 transition-colors cursor-help">V8 Engine</span>
+        </div>
       </div>
     </div>
   );

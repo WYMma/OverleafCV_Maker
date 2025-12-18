@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+body {
+  @apply text-slate-900 selection:bg-primary-100 selection:text-primary-900;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  scroll-behavior: smooth;
+}
+
+h1,
+h2,
+h3,
+h4,
+.font-display {
+  @apply font-display tracking-tight;
+}
+
+/* Glassmorphism Utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+}
+
+/* Page Transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms, transform 400ms;
+}
+
+/* Better Mesh Backdrop */
+.bg-mesh {
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(52, 211, 153, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(52, 211, 153, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+/* Animations (Modern subset of tailwindcss-animate) */
+@keyframes in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-1rem);
+  }
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    transform: translateY(1rem);
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-1rem);
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(1rem);
+  }
+}
+
+@keyframes zoom-in {
+  from {
+    transform: scale(0.95);
+  }
+}
+
+.animate-in {
+  animation: in 400ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.slide-in-from-top-4 {
+  animation: in 400ms ease-out both, slide-in-from-top 400ms ease-out both;
+}
+
+.slide-in-from-bottom-8 {
+  animation: in 500ms ease-out both, slide-in-from-bottom 500ms ease-out both;
+}
+
+.slide-in-from-left-4 {
+  animation: in 400ms ease-out both, slide-in-from-left 400ms ease-out both;
+}
+
+.slide-in-from-right-4 {
+  animation: in 400ms ease-out both, slide-in-from-right 400ms ease-out both;
+}
+
+.zoom-in-95 {
+  animation: in 300ms ease-out both, zoom-in 300ms ease-out both;
+}
+
+/* Buttons & Interactive */
+.btn-premium {
+  @apply relative overflow-hidden transition-all duration-300 active:scale-95 shadow-sm hover:shadow-md;
+}
+
+.btn-premium::after {
+  content: '';
+  @apply absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300;
+}
+
+.btn-premium:hover::after {
+  @apply opacity-100;
+}
+
+.fill-mode-both {
+  animation-fill-mode: both;
+}
+
+.duration-500 {
+  animation-duration: 500ms;
+}
+
+.duration-700 {
+  animation-duration: 700ms;
+}
